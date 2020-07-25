@@ -7,7 +7,7 @@ namespace ConsoleMenuGenerator.MenuItems
 {
     public class ObjectItem : NavigationItem
     {
-        public ObjectItem(NavigationItem navigationParent, string displayText, Object obj)
+        public ObjectItem(NavigationItem navigationParent, string displayText, Object obj) : base(navigationParent, displayText)
         {
         }
 

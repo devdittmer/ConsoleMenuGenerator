@@ -24,6 +24,8 @@ namespace ConsoleMenuGenerator.MenuItems
             StartKeyCapturing();
         }
 
+        // Todo: Async FunctionItem?
+
         private void StartKeyCapturing()
         {
             ConsoleKeyInfo pressedKey;
