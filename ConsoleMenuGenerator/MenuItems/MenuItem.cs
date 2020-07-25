@@ -1,65 +1,49 @@
-﻿using System;
+﻿using ConsoleMenuGenerator.Contracts;
+using ConsoleMenuGenerator.Exceptions;
 using ConsoleMenuGenerator.Extensions;
-using ConsoleMenuGenerator.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using ConsoleMenuGenerator.Exceptions;
 
-namespace ConsoleMenuGenerator.Entities
+namespace ConsoleMenuGenerator.MenuItems
 {
-    public class ConsoleMenu : IConsoleMenu
+    public class MenuItem : NavigationItem
     {
-        public string DisplayText { get; set; }
-        
-        public Action OnNavigate { get; set; }
+        internal IList<NavigationItem> _navigationItems = new List<NavigationItem>();
 
-        public IList<IConsoleMenu> SubMenus { get; set; } = new List<IConsoleMenu>();
-        
-        internal IConsoleMenu _parentMenu;
+        internal int _choosenItem;
 
-        private int _choosenItem;
+        internal bool _refreshConsole;
 
-        private bool _refreshConsole;
+        internal bool _isRootMenu;
 
-        private bool _isRootMenu;
-
-        internal ConsoleMenu()
+        public MenuItem() : base()
         {
             _isRootMenu = true;
         }
 
-        private ConsoleMenu(IConsoleMenu parentMenu, string displayText)
+        public MenuItem(NavigationItem navigationParent, string displayText) : base(navigationParent, displayText)
         {
-            DisplayText = displayText;
-            _parentMenu = parentMenu;
             _isRootMenu = false;
         }
 
-        private ConsoleMenu(IConsoleMenu parentMenu, string displayText, Action onNavigate) {
-            DisplayText = displayText;
-            OnNavigate = onNavigate;
-            _parentMenu = parentMenu;
-            _isRootMenu = false;
-        }   
-
-        public IConsoleMenu AddItem(string displayText)
+        public MenuItem AddMenuItem(string displayText)
         {
-            return SubMenus.AddAndReturn(new ConsoleMenu(this, displayText));
+            return _navigationItems.AddAndReturn(new MenuItem(this, displayText)) as MenuItem;
         }
 
-        public IConsoleMenu AddItem(string displayText, Action onNavigate)
+        public void AddFunctionItem(string displayText, Func<string> onNavigate)
         {
-            return SubMenus.AddAndReturn(new ConsoleMenu(this, displayText, onNavigate));
+            _navigationItems.Add(new FunctionItem(this, displayText, onNavigate));
         }
 
-        public void Render()
+        public override void Invoke()
         {
-            if (SubMenus.Count == 0)
+            if (_navigationItems.Count == 0)
             {
                 throw new ZeroRootItemsException();
             }
 
-            _choosenItem = 0;
             StartKeyCapturing();
         }
 
@@ -67,6 +51,7 @@ namespace ConsoleMenuGenerator.Entities
         {
             ConsoleKeyInfo pressKey;
             _refreshConsole = true;
+            _choosenItem = 0;
 
             do
             {
@@ -89,10 +74,10 @@ namespace ConsoleMenuGenerator.Entities
                         break;
                     case ConsoleKey.Enter:
                         Console.Clear();
-                        SubMenus[_choosenItem].Render();
+                        _navigationItems[_choosenItem].Invoke();
                         break;
                     case ConsoleKey.Backspace:
-                        if (!_isRootMenu) _parentMenu.Render();
+                        if (!_isRootMenu) _parentItem.Invoke();
                         break;
                 }
             }
@@ -112,7 +97,7 @@ namespace ConsoleMenuGenerator.Entities
         internal void ProcessDownArrowKeyPress()
         {
             var change = _choosenItem + 1;
-            if (change < SubMenus.Count)
+            if (change < _navigationItems.Count)
             {
                 _choosenItem = change;
                 _refreshConsole = true;
@@ -121,18 +106,18 @@ namespace ConsoleMenuGenerator.Entities
 
         internal void RenderMenuItems()
         {
-            for (var i = 0; i < SubMenus.Count; i++)
+            for (var i = 0; i < _navigationItems.Count; i++)
             {
                 if (i == _choosenItem)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write("> ");
                     Console.ResetColor();
-                    Console.WriteLine(SubMenus[i].DisplayText);
+                    Console.WriteLine(_navigationItems[i].DisplayText);
                 }
                 else
                 {
-                    Console.WriteLine(SubMenus[i].DisplayText);
+                    Console.WriteLine(_navigationItems[i].DisplayText);
                 }
             }
         }

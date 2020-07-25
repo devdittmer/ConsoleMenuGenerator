@@ -7,14 +7,22 @@ namespace ConsoleMenuGenerator.Tester
         static void Main(string[] args)
         {
             var consoleMenuBuilder = new ConsoleMenuBuilder();
-            var firstRootItem = consoleMenuBuilder.AddRooItem("First");
-            var secondRootItem = consoleMenuBuilder.AddRooItem("Second");
-            var thirdRooItem = consoleMenuBuilder.AddRooItem("Third");
+            var rootMenu = consoleMenuBuilder.CreateRootMenu();
 
-            var firstSubItem = firstRootItem.AddItem("First Sub Item", () =>
+            rootMenu.AddFunctionItem("Function1", () =>
             {
-                Console.WriteLine("First Sub Item");
+                return "Hello World!";
             });
+
+            var secondMenu = rootMenu.AddMenuItem("Menu1");
+            secondMenu.AddFunctionItem("Menu1 Hello1", () =>
+            {
+                return "Menu1 Hello World";
+            });
+
+            var thirdMenu = secondMenu.AddMenuItem("Third Menu");
+
+            secondMenu.AddFunctionItem("Menu1 Hello2", () => "Hello World Menu2" );
 
             consoleMenuBuilder.Build();
         }

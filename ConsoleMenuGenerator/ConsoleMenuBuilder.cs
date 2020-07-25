@@ -1,36 +1,27 @@
 ﻿using ConsoleMenuGenerator.Contracts;
-using ConsoleMenuGenerator.Entities;
-using ConsoleMenuGenerator.Exceptions;
-using ConsoleMenuGenerator.Extensions;
+using ConsoleMenuGenerator.MenuItems;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConsoleMenuGenerator
 {
     public class ConsoleMenuBuilder
     {
-        private IConsoleMenu _rootMenu;
+        private MenuItem _rootMenu;
 
         public ConsoleMenuBuilder()
         {
             Console.CursorVisible = false;
-            _rootMenu = new ConsoleMenu();
+            _rootMenu = new MenuItem();
         }
 
-        public IConsoleMenu AddRooItem(string displayText)
+        public MenuItem CreateRootMenu()
         {
-            return _rootMenu.AddItem(displayText);
-        }
-
-        public IConsoleMenu AddRooItem(string displayText, Action onNavigate)
-        {
-            return _rootMenu.AddItem(displayText, onNavigate);
+            return _rootMenu;
         }
 
         public void Build()
         {
-            _rootMenu.Render();
+            _rootMenu.Invoke();
         }
     }
 }
