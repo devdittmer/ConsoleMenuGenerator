@@ -6,17 +6,17 @@ namespace ConsoleMenuGenerator.Tester
     {
         static void Main(string[] args)
         {
-            var consoleMenu = new ConsoleMenu();
-            var firsRootItem = consoleMenu.AddRooItem("First", () =>
+            var consoleMenuBuilder = new ConsoleMenuBuilder();
+            var firstRootItem = consoleMenuBuilder.AddRooItem("First");
+            var secondRootItem = consoleMenuBuilder.AddRooItem("Second");
+            var thirdRooItem = consoleMenuBuilder.AddRooItem("Third");
+
+            var firstSubItem = firstRootItem.AddItem("First Sub Item", () =>
             {
-                Console.WriteLine("Hello World!");
+                Console.WriteLine("First Sub Item");
             });
-            var secondRootItem = consoleMenu.AddRooItem("Second");
-            var thirdRooItem = consoleMenu.AddRooItem("Third");
 
-
-            consoleMenu.Render();
-            Console.ReadLine();
+            consoleMenuBuilder.Build();
         }
     }
 }
