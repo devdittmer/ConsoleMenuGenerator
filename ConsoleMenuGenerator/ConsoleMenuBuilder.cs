@@ -1,21 +1,25 @@
 ﻿using ConsoleMenuGenerator.Contracts;
-using ConsoleMenuGenerator.MenuItems;
+using ConsoleMenuGenerator.Exceptions;
+using ConsoleMenuGenerator.Navigations;
 using System;
 
 namespace ConsoleMenuGenerator
 {
     public class ConsoleMenuBuilder
     {
-        private MenuItem _rootMenu;
+        private MenuNavigation _rootMenu;
 
         public ConsoleMenuBuilder()
         {
             Console.CursorVisible = false;
-            _rootMenu = new MenuItem();
         }
 
-        public MenuItem CreateRootMenu()
+        public MenuNavigation CreateRootMenu()
         {
+            _rootMenu = _rootMenu == null ?
+                new MenuNavigation() :
+                throw new MultipleRootMenuException();
+
             return _rootMenu;
         }
 

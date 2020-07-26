@@ -5,29 +5,34 @@ using System.Collections.Generic;
 using System.Text;
 using ConsoleMenuGenerator.Exceptions;
 
-namespace ConsoleMenuGenerator.MenuItems
+namespace ConsoleMenuGenerator.Navigations.Base
 {
-    public abstract class NavigationItem
+    public abstract class Navigation
     {
         public string DisplayText { get; set; }
 
-        internal NavigationItem _parentItem;
+        internal Navigation _parentItem;
 
-        internal NavigationItem()
+        internal Navigation()
         {
         }
 
-        internal NavigationItem(string displayText)
+        internal Navigation(string displayText)
         {
             DisplayText = displayText;
         }
 
-        internal NavigationItem(NavigationItem parentItem, string displayText)
+        internal Navigation(Navigation parentItem, string displayText)
         {
+            DisplayText = displayText;
             _parentItem = parentItem;
-            DisplayText = displayText;
         }
 
         public abstract void Invoke();
+
+        public void InvokeParent()
+        {
+            _parentItem.Invoke();
+        }
     }
 }

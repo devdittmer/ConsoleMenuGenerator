@@ -1,15 +1,16 @@
 ﻿using ConsoleMenuGenerator.Contracts;
 using ConsoleMenuGenerator.Exceptions;
 using ConsoleMenuGenerator.Extensions;
+using ConsoleMenuGenerator.Navigations.Base;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConsoleMenuGenerator.MenuItems
+namespace ConsoleMenuGenerator.Navigations
 {
-    public class MenuItem : NavigationItem
+    public class MenuNavigation : Navigation
     {
-        internal IList<NavigationItem> _navigationItems = new List<NavigationItem>();
+        internal IList<Navigation> _navigations = new List<Navigation>();
 
         internal int _choosenItem;
 
@@ -17,29 +18,39 @@ namespace ConsoleMenuGenerator.MenuItems
 
         internal bool _isRootMenu;
 
-        public MenuItem() : base()
+        public MenuNavigation() : base()
         {
             _isRootMenu = true;
         }
 
-        public MenuItem(NavigationItem navigationParent, string displayText) : base(navigationParent, displayText)
+        public MenuNavigation(Navigation navigationParent, string displayText) : base(navigationParent, displayText)
         {
             _isRootMenu = false;
         }
 
-        public MenuItem AddMenuItem(string displayText)
+        public MenuNavigation AddMenuNavigation(string displayText)
         {
-            return _navigationItems.AddAndReturn(new MenuItem(this, displayText)) as MenuItem;
+            return _navigations.AddAndReturn(new MenuNavigation(this, displayText)) as MenuNavigation;
         }
 
-        public void AddFunctionItem(string displayText, Func<string> onNavigate)
+        public void AddFunctionNavigation(string displayText, Func<string> onNavigate)
         {
-            _navigationItems.Add(new FunctionItem(this, displayText, onNavigate));
+            _navigations.Add(new FunctionNavigation(this, displayText, onNavigate));
+        }
+
+        public void AddObjectNavigation<T>(string displayText, T obj, params string[] displayProperties)
+        {
+            _navigations.Add(new ObjectNavigation<T>(this, displayText, obj, displayProperties));
+        }
+
+        public void AddEnumerableObjectNavigation<T>(string displayProperty, IList<T> objs, string objectDisplayProperty, params string[] displayProperties)
+        {
+            _navigations.Add(new EnumerableObjectNavigation<T>(this, displayProperty, objs, objectDisplayProperty, displayProperties));
         }
 
         public override void Invoke()
         {
-            if (_navigationItems.Count == 0)
+            if (_navigations.Count == 0)
             {
                 throw new ZeroRootItemsException();
             }
@@ -74,10 +85,10 @@ namespace ConsoleMenuGenerator.MenuItems
                         break;
                     case ConsoleKey.Enter:
                         Console.Clear();
-                        _navigationItems[_choosenItem].Invoke();
+                        _navigations[_choosenItem].Invoke();
                         break;
                     case ConsoleKey.Backspace:
-                        if (!_isRootMenu) _parentItem.Invoke();
+                        if (!_isRootMenu) InvokeParent();
                         break;
                 }
             }
@@ -97,7 +108,7 @@ namespace ConsoleMenuGenerator.MenuItems
         internal void ProcessDownArrowKeyPress()
         {
             var change = _choosenItem + 1;
-            if (change < _navigationItems.Count)
+            if (change < _navigations.Count)
             {
                 _choosenItem = change;
                 _refreshConsole = true;
@@ -106,18 +117,18 @@ namespace ConsoleMenuGenerator.MenuItems
 
         internal void RenderMenuItems()
         {
-            for (var i = 0; i < _navigationItems.Count; i++)
+            for (var i = 0; i < _navigations.Count; i++)
             {
                 if (i == _choosenItem)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write("> ");
                     Console.ResetColor();
-                    Console.WriteLine(_navigationItems[i].DisplayText);
+                    Console.WriteLine(_navigations[i].DisplayText);
                 }
                 else
                 {
-                    Console.WriteLine(_navigationItems[i].DisplayText);
+                    Console.WriteLine(_navigations[i].DisplayText);
                 }
             }
         }

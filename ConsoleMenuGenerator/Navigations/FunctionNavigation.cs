@@ -1,14 +1,15 @@
 ﻿using ConsoleMenuGenerator.Contracts;
 using ConsoleMenuGenerator.Extensions;
+using ConsoleMenuGenerator.Navigations.Base;
 using System;
 
-namespace ConsoleMenuGenerator.MenuItems
+namespace ConsoleMenuGenerator.Navigations
 {
-    public class FunctionItem : NavigationItem
+    public class FunctionNavigation : Navigation
     {
         private Func<string> _onNavigate;
 
-        public FunctionItem(NavigationItem navigationParent, string displayText, Func<string> onNavigate) : base(navigationParent, displayText)
+        public FunctionNavigation(Navigation navigationParent, string displayText, Func<string> onNavigate) : base(navigationParent, displayText)
         {
             _onNavigate = onNavigate;
         }
@@ -36,7 +37,7 @@ namespace ConsoleMenuGenerator.MenuItems
             }
             while (pressedKey.Key != ConsoleKey.Backspace);
 
-            _parentItem.Invoke();
+            InvokeParent();
         }
     }
 }
