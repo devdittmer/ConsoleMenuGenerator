@@ -1,38 +1,37 @@
 ﻿using System;
 using ConsoleMenuGenerator.Extensions;
-using ConsoleMenuGenerator.Contracts;
 using System.Collections.Generic;
 using System.Text;
 using ConsoleMenuGenerator.Exceptions;
 
 namespace ConsoleMenuGenerator.Navigations.Base
 {
-    public abstract class Navigation
+    public abstract class NavigationBase
     {
         public string DisplayText { get; set; }
 
-        internal Navigation _parentItem;
+        internal NavigationBase _parent;
 
-        internal Navigation()
+        internal NavigationBase()
         {
         }
 
-        internal Navigation(string displayText)
+        internal NavigationBase(string displayText)
         {
             DisplayText = displayText;
         }
 
-        internal Navigation(Navigation parentItem, string displayText)
+        internal NavigationBase(NavigationBase parent, string displayText)
         {
             DisplayText = displayText;
-            _parentItem = parentItem;
+            _parent = parent;
         }
 
-        public abstract void Invoke();
+        internal abstract void Invoke();
 
-        public void InvokeParent()
+        internal void InvokeParent()
         {
-            _parentItem.Invoke();
+            _parent.Invoke();
         }
     }
 }

@@ -5,19 +5,19 @@ using System;
 
 namespace ConsoleMenuGenerator
 {
-    public class ConsoleMenuBuilder
+    public class ConsoleMenuBuilder : IConsoleMenuBuilder
     {
-        private MenuNavigation _rootMenu;
+        private BasicMenu _rootMenu;
 
         public ConsoleMenuBuilder()
         {
             Console.CursorVisible = false;
         }
 
-        public MenuNavigation CreateRootMenu()
+        public IBasicMenu CreateRootMenu()
         {
             _rootMenu = _rootMenu == null ?
-                new MenuNavigation() :
+                new BasicMenu() :
                 throw new MultipleRootMenuException();
 
             return _rootMenu;
